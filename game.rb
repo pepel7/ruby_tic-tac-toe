@@ -57,6 +57,8 @@ end
 
 ### Methods ###
 
+require "colorize"
+
 def get_user_team
   team = ""
   loop do
@@ -68,17 +70,47 @@ def get_user_team
   team
 end
 
-def set_teams(team)
-  if team == "X"
+def set_teams(user_team)
+  if user_team == "X"
     Cross.owner = "user"
     Nought.owner = "computer"
-  elsif team == "O"
+  elsif user_team == "O"
     Cross.owner = "computer"
     Nought.owner = "user"
   end
+end
+
+def colorize_coord(coordinate)
+  if coordinate.to_i > 0
+    coordinate.gray
+  elsif coordinate.class.owner == "user"
+    coordinate.purple
+  else coordinate end
+end
+
+def show_table(table)
+  puts "  ___________________
+  |     |     |     |
+  |  #{colorize_coord(table[0][0])}  |  #{colorize_coord(table[0][1])}  |  #{colorize_coord(table[0][2])}  |
+  |_____|_____|_____|
+  |     |     |     |
+  |  #{colorize_coord(table[1][0])}  |  #{colorize_coord(table[1][1])}  |  #{colorize_coord(table[1][2])}  |
+  |_____|_____|_____|
+  |     |     |     |
+  |  #{colorize_coord(table[2][0])}  |  #{colorize_coord(table[2][1])}  |  #{colorize_coord(table[2][2])}  |
+  |_____|_____|_____|
+  "
 end
 
 ### Program ###
 
 user_team = get_user_team
 set_teams(user_team)
+
+table = [
+  ["1", "2", "3"],
+  ["4", "5", "6"],
+  ["7", "8", "9"]
+]
+
+show_table(table)
