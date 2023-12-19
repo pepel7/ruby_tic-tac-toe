@@ -1,3 +1,5 @@
+require "colorize"
+
 ### Pseudocode ###
 
 # Дізнатися в юзера його бажану команду
@@ -9,7 +11,7 @@
 #
 # Коли будь-який гравець досяг 3-ох поставлених знаків, перевірити, чи не стоять
 # чиїсь знаки в ряд чи діагонально
-# Якщо стоять, цей гравець -- переможець 
+# Якщо стоять, цей гравець -- переможець
 # Якщо ні, продовжити розставляння знаків по черзі
 # Якщо кількість усіх поставлених знаків == 9 -- нічия
 #
@@ -17,100 +19,87 @@
 
 ### Classes ###
 
-class Mark
-  def initialize(position)
-    @position = position
-  end
-end
-
-class Nought
-  @@owner = nil
+class Game
+  protected
   
-  def self.owner
-    @@owner
+  def get_user_team
+    team = ""
+    loop do
+      puts "Pick a team (X or O):"
+      team = gets.chomp.upcase
+      break if team == "X" || team == "O"
+      puts "You should choose between X or O. Please try again:"
+    end
+    team
+  end
+  
+  def set_teams
+    if @user_team == "X"
+      @computer_team = "O"
+    elsif @user_team == "O"
+      @computer_team = "X"
+    end
   end
 
-  def self.owner=(owner)
-    @@owner = owner
+  def colorize_coord(coordinate)
+    if coordinate.is_a?(Integer)
+      coordinate.to_s.gray
+    elsif coordinate == user_team
+      coordinate.magenta
+    else coordinate end
   end
 
-  def initialize(position)
-    super(position)
-  end
-end
-
-class Cross
-  @@owner = nil
-
-  def self.owner
-    @@owner
-  end
-
-  def self.owner=(owner)
-    @@owner = owner
+  def show_table
+    puts "    ___________________
+    |     |     |     |
+    |  #{colorize_coord(@table[1])}  |  #{colorize_coord(@table[2])}  |  #{colorize_coord(@table[3])}  |
+    |_____|_____|_____|
+    |     |     |     |
+    |  #{colorize_coord(@table[4])}  |  #{colorize_coord(@table[5])}  |  #{colorize_coord(@table[6])}  |
+    |_____|_____|_____|
+    |     |     |     |
+    |  #{colorize_coord(@table[7])}  |  #{colorize_coord(@table[8])}  |  #{colorize_coord(@table[9])}  |
+    |_____|_____|_____|
+    "
   end
 
-  def initialize(position)
-    super(position)
+  def put_mark
+    puts "Enter a number where you want to put your mark:"
+    pos = gets.chomp.to_i
+    if @table[pos].is_a?(Integer)
+      @table[pos] = user_team
+    elsif @table[pos].nil?
+      puts "Invalid input. Please try again."
+    else
+      puts "That square is already marked. Let's choose another one."
+    end
   end
-end
+  
+  attr_accessor :computer_team, :user_team
 
-### Methods ###
-
-require "colorize"
-
-def get_user_team
-  team = ""
-  loop do
-    puts "Pick a team (X or O):"
-    team = gets.chomp.upcase
-    break if team == "X" || team == "O"
-    puts "You should choose between X or O. Please try again:"
+  def initialize
+    @computer_team = nil
+    @user_team = get_user_team
+    set_teams
+    @table = {
+      1 => 1,   2 => 2,   3 => 3,
+      4 => 4,   5 => 5,   6 => 6,
+      7 => 7,   8 => 8,   9 => 9
+    }
+    @winner = nil
   end
-  team
-end
 
-def set_teams(user_team)
-  if user_team == "X"
-    Cross.owner = "user"
-    Nought.owner = "computer"
-  elsif user_team == "O"
-    Cross.owner = "computer"
-    Nought.owner = "user"
+  public
+  
+  def play_game
+    loop do
+      show_table
+      put_mark
+    end
   end
-end
-
-def colorize_coord(coordinate)
-  if coordinate.to_i > 0
-    coordinate.gray
-  elsif coordinate.class.owner == "user"
-    coordinate.purple
-  else coordinate end
-end
-
-def show_table(table)
-  puts "  ___________________
-  |     |     |     |
-  |  #{colorize_coord(table[0][0])}  |  #{colorize_coord(table[0][1])}  |  #{colorize_coord(table[0][2])}  |
-  |_____|_____|_____|
-  |     |     |     |
-  |  #{colorize_coord(table[1][0])}  |  #{colorize_coord(table[1][1])}  |  #{colorize_coord(table[1][2])}  |
-  |_____|_____|_____|
-  |     |     |     |
-  |  #{colorize_coord(table[2][0])}  |  #{colorize_coord(table[2][1])}  |  #{colorize_coord(table[2][2])}  |
-  |_____|_____|_____|
-  "
 end
 
 ### Program ###
 
-user_team = get_user_team
-set_teams(user_team)
-
-table = [
-  ["1", "2", "3"],
-  ["4", "5", "6"],
-  ["7", "8", "9"]
-]
-
-show_table(table)
+game_object = Game.new 
+game_object.play_game
