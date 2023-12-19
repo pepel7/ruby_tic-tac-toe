@@ -1,22 +1,5 @@
 require "colorize"
 
-### Pseudocode ###
-
-# Дізнатися в юзера його бажану команду
-# Поставити протилежну команду комп'ютеру
-# Запитати в юзера бажане місце для знаку
-# Поставити в це бажане місце знак
-# Вибрати рандомом місце для знаку комп'ютера
-# Поставити в рандомне місце знак комп'ютера
-#
-# Коли будь-який гравець досяг 3-ох поставлених знаків, перевірити, чи не стоять
-# чиїсь знаки в ряд чи діагонально
-# Якщо стоять, цей гравець -- переможець
-# Якщо ні, продовжити розставляння знаків по черзі
-# Якщо кількість усіх поставлених знаків == 9 -- нічия
-#
-# Відобразити результати гри
-
 ### Classes ###
 
 class Game
@@ -89,12 +72,55 @@ class Game
     @winner = nil
   end
 
+  def get_results_for(team)
+    case
+    when [1,2,3].all? {|e| @table[e] == team}
+      @winner = team
+    when [4,5,6].all? {|e| @table[e] == team}
+      @winner = team
+    when [7,8,9].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    when [1,4,7].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    when [2,5,8].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    when [3,6,9].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    when [1,5,9].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    when [3,5,7].to_a.all? {|e| @table[e] == team}
+      @winner = team
+    end
+  end
+
+  def put_computer_mark
+    loop do
+      pos = (1..9).to_a.sample
+      if @table[pos].is_a?(Integer)
+        @table[pos] = computer_team
+        break
+      end
+    end
+  end
+  
   public
   
   def play_game
     loop do
       show_table
       put_mark
+      get_results_for(user_team)
+      get_results_for(computer_team)
+      if @winner
+        show_table
+        puts "The game is over. The winner is #{@winner}!"
+        break
+      elsif @table.all? {|k,v| not v.is_a?(Integer)} # i.e. all squares are marked
+        show_table
+        puts "A draw."
+        break
+      end
+      put_computer_mark
     end
   end
 end
