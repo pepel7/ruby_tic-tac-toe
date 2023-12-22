@@ -4,6 +4,8 @@ require "colorize"
 
 class Game
   protected
+
+  WIN_COMBOS = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]]
   
   def get_user_team
     team = ""
@@ -73,24 +75,20 @@ class Game
   end
 
   def get_results_for(team)
-    case
-    when [1,2,3].all? {|e| @table[e] == team}
-      @winner = team
-    when [4,5,6].all? {|e| @table[e] == team}
-      @winner = team
-    when [7,8,9].to_a.all? {|e| @table[e] == team}
-      @winner = team
-    when [1,4,7].to_a.all? {|e| @table[e] == team}
-      @winner = team
-    when [2,5,8].to_a.all? {|e| @table[e] == team}
-      @winner = team
-    when [3,6,9].to_a.all? {|e| @table[e] == team}
-      @winner = team
-    when [1,5,9].to_a.all? {|e| @table[e] == team}
-      @winner = team
-    when [3,5,7].to_a.all? {|e| @table[e] == team}
+    if combo_completed?(team)
       @winner = team
     end
+  end
+
+  def combo_completed?(team)
+    result = false
+    WIN_COMBOS.each do |combo|
+      if combo.all? { |pos| @table[pos] == team}
+        result = true
+        break
+      end
+    end
+    result
   end
 
   def put_computer_mark
